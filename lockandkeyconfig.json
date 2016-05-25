@@ -1,1 +1,6 @@
-{"port":3000,"adminport":3001,"unlocktimeout":5,"modemmanufacturerstring":"Conexant"}
+{
+  "port":3000,
+  "adminport":3001,
+  "unlocktimeout":15,
+  "modem_id":"Conexant"
+}
