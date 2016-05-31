@@ -1,47 +1,45 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<link rel="stylesheet" href="/static/lockandkey.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<title>Lock and Key</title>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-</head>
-<body onload="update()">
-	
-	<script type="text/javascript">
-	
-		
-		
-     function update() {
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Login form shake effect</title>
+    
+    
+    
+    <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css'>
 
+        <link rel="stylesheet" href="css/style.css">
 
+    
+    
+    
+  </head>
 
-if (window.location.search.search("error") > 0)
-{
-	$('.error').html("<em>Invalid Passphrase</em>");
-}
-	}
-</script>
-	
-<div class="container">	
-	<div class="row">
-		<div class=".col-md-12">
-			<h1>
-				Lock and Key
-			</h1>
-		</div>
-		<form role="form" action="/authorize" method="post">
-		<div class="form-group">
-			<label for="pwd">Passphrase:</label>
-			<input type="text" maxlength="35" class="form-control" name="pwd">
-		</div>
-		<p class="error bg-danger"></p>
-		<button type="submit" class="btn btn-primary">Submit</button>
-		</form>
-	</div>
-</div>
+  <body>
 
-</body>
+    <div class="login-form">
+     <h1>Vini</h1>
+     <form id="login" role="form" action="/login" method="post">
+     <div class="form-group ">
+       <input type="text" class="form-control" placeholder="Username" name="username">
+       <i class="fa fa-user"></i>
+     </div>
+     <div class="form-group log-status">
+       <input type="password" class="form-control" placeholder="Password" name="password">
+       <i class="fa fa-lock"></i>
+     </div>
+      <!-- <span class="alert">Invalid Credentials</span> -->
+     <button type="submit" class="log-btn">Log in</button>
+     </form>
+     
+    
+   </div>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+        <script src="js/index.js"></script>
+
+    
+    
+    
+  </body>
 </html>
