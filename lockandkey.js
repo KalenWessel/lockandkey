@@ -36,11 +36,14 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 app.use(bodyParser());
 app.use(cookieParser('Authentication Tutorial '));
-app.use(session());
+app.use(session({secret: '1234567890QWERTY'}));
 app.use('/', express.static(__dirname + '/public'));
-// app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
+
+app.get("/", function (req, res) {
+  res.redirect("/login");
+});
 
 app.use(function (req, res, next) {
   var err = req.session.error,
@@ -48,8 +51,10 @@ app.use(function (req, res, next) {
   delete req.session.error;
   delete req.session.success;
   res.locals.message = '';
+  res.locals.session = req.session
   if (err) res.locals.message = err;
   if (msg) res.locals.message = msg;
+  
   next();
 });
 
@@ -58,7 +63,7 @@ app.use(function (req, res, next) {
 Helper Functions
 */
 function authenticate(name, pass, fn) {
-  if (!module.parent) console.log('authenticating %s:%s', name, pass);
+  if (!module.parent) console.log('authenticating %s', name);
 
   User.findOne({
     username: name
@@ -175,7 +180,7 @@ serialport.list(function (err, ports) {
       }
 
       if ((data.substring(0,4) == "RING")&&(PickUpAndDialSix == false)) {
-	console.log("Ring Detected, but don't pick up");
+	console.log("Ring detected, but don't pick up");
       }
 
       if (data.substring(0,2) == "OK") {
@@ -268,8 +273,6 @@ admin.post('/delete', function (request, response){
 
 //Run this periodically to see if we should re-lock the door (ie: set a flag to not answer and dial nine)
 setInterval(function(){
-  console.log("Checking lock");
-  console.log(Config.unlocktimeout);
   var setLock = function(){
     User.update({ "lock": false }, { $set: { "lock":true } }, {multi: true}, function(err, result){
       if ( err ) throw err;
@@ -282,8 +285,6 @@ setInterval(function(){
     User.find(function(err, items) {
       if ( err ) throw err;
       items.forEach(function(item, index) {
-        console.log(Date.now())
-        console.log(item.end_date);
         if ((Date.now() > item.end_date) && item.lock == false) {
 	  setLock();
         }
@@ -294,19 +295,32 @@ setInterval(function(){
     
 }, 10*1000);      
 
-
 app.get("/login", function (req, res) {
-    res.render("login");
+  res.render("login");
+});
+
+app.get('/logout', function (req, res) {
+  req.session.destroy(function () {
+    res.redirect('/');
+  });
+});
+
+app.get("/success", requiredAuthentication, function (req, res) {
+  res.render('success', {
+    username: req.session.user.username,
+    endDate: req.session.enddate
+  });
 });
 
 app.post("/login", function (req, res) {
   authenticate(req.body.username, req.body.password, function (err, user) {
     if (user) {
       req.session.regenerate(function () {
-        req.session.user = user;
-        req.session.success = 'Authenticated as ' + user.username + ' click to <a href="/logout">logout</a>. ' + ' You may now access <a href="/restricted">/restricted</a>.';
         var startDate = new Date();
         var endDate = new Date(startDate.getTime() + Config.unlocktimeout*60000);
+        req.session.user = user;
+        req.session.enddate = endDate
+        req.session.success = 'Authenticated as ' + user.username + ', you have until: ' + endDate + ' to buzz up.';
         var setUser = function(){
 	  User.update({username : user.username}, {$set:{start_date : startDate, end_date : new Date(endDate), lock : false}}, function(err, result){
 	    if ( err ) throw err;
@@ -317,9 +331,10 @@ app.post("/login", function (req, res) {
         // Turn On Auto Answer
         PickUpAndDialSix = true;
         setUser();
-        console.log(endDate);
-        //res.sendFile('success.html', { root: __dirname  + '/public'});
-        res.redirect('success.html?unlocktimeout='+Config.unlocktimeout);
+        res.render('success', {
+          username: req.session.user.username,
+          endDate: req.session.enddate
+        });
       });
     } else {
       req.session.error = 'Authentication failed, please check your ' + ' username and password.';
