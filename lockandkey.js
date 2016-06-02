@@ -295,8 +295,12 @@ setInterval(function(){
     
 }, 10*1000);      
 
-app.get("/login", function (req, res) {
-  res.render("login");
+app.get("/login", function (req, res, next) {
+  if (req.session.user) {
+    res.redirect("/success")
+  } else {
+    res.render("login");
+  }
 });
 
 app.get('/logout', function (req, res) {
@@ -338,7 +342,7 @@ app.post("/login", function (req, res) {
       });
     } else {
       req.session.error = 'Authentication failed, please check your ' + ' username and password.';
-      res.redirect('/login');
+      res.redirect('/login')
     }
   });
 });
