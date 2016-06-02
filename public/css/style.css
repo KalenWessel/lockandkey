@@ -89,6 +89,28 @@ h1 {
   border-radius: 4px;
 }
 
+.logout-btn {
+  background: #ddd;
+  dispaly: inline-block;
+  font-size: 16px;
+  height: 30px;
+  color: #fff;
+  text-decoration: none;
+  border: #ccc;
+  border-width: 2px;
+  border-style: solid;
+  padding: 5px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.logoutdiv {
+  width: 20%;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+
 .link {
   text-decoration: none;
   color: #C6C6C6;
@@ -102,7 +124,6 @@ h1 {
 }
 
 .alert {
-  display: none;
   font-size: 12px;
   color: #f00;
   float: left;

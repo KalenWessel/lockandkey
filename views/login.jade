@@ -13,8 +13,7 @@ html
                 input.form-control(type="text", placeholder="Username", name="username")
                 .form-group
                 input.form-control(type="password", placeholder="Password", name="password")
+                p.alert #{message}
                 input.log-btn(type="submit", value="Log In")
-
-           p.alert!=message
         script(src="js/index.js")
         script(src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')

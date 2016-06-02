@@ -17,7 +17,8 @@ html
                 div
                   span.seconds
                   .smalltext Seconds
-        a(href="/logout") Logout
+              .logoutdiv 
+                a.logout-btn(href="/logout") Logout
         script(type='text/javascript').                                                   
           var time =!{JSON.stringify(endDate)};
         script(src="js/index.js")
