@@ -10,7 +10,7 @@ A Raspberry Pi runs a nodejs application backed by a mongo databases for persist
 When the app notices a succesful login it handles a few things:
 1. Sets the usesrs `LOCK` flag to `False`
 2. Updates the users last successful login `timestamp`
-2. Sets the `auto-answer` flag to `True`
+3. Sets the `auto-answer` flag to `True`
 
 Now when the guest dials my unit number the application will answer the call, dial 6, and hang up the call. The main entrance door will be unlocked and my guest can enter the building. A check runs every 10 seconds looking for users who have their `LOCK` flag set to `False` and `current time` is not greater than the `login time + unlocktimeout`. 
 ## Hardware
@@ -37,6 +37,12 @@ lockandkeyconfig.json contains a few options you can customize to your liking:
 2. Install mongo db
 3. Clone git repo
 4. npm install
+
+
+## TODO
+- [ ] Setup Lets Encrypt for SSL
+- [ ] Create admin portal for adding and deleting users
+- [ ] Setup email alerts when someone logins or dials my buzzer
 
 ## Credit
 Original codebase: [raudette/lockandkey](https://github.com/raudette/lockandkey)  
