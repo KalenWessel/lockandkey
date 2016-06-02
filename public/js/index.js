@@ -32,6 +32,8 @@ function initializeClock(id, endtime) {
     secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
 
     if (t.total <= 0) {
+      minutesSpan.innerHTML = ('00');
+      secondsSpan.innerHTML = ('00');
       clearInterval(timeinterval);
     }
   }
