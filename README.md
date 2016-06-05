@@ -13,6 +13,13 @@ When the app notices a succesful login it handles a few things:
 3. Sets the `auto-answer` flag to `True`
 
 Now when the guest dials my unit number the application will answer the call, dial 6, and hang up the call. The main entrance door will be unlocked and my guest can enter the building. A check runs every 10 seconds looking for users who have their `LOCK` flag set to `False` and `current time` is not greater than the `login time + unlocktimeout`. 
+
+## Admin Portal
+![Alt text](http://i.imgur.com/x8gUg9T.jpg "") 
+
+The admin portal listens on a seperate port and should **ONLY** be accessible from your private LAN. It allows you to add new users as well as delete exisiting ones. 
+
+
 ## Hardware
 1. Raspberry Pi Model B
 2. TFM-561U
