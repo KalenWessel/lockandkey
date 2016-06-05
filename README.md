@@ -5,7 +5,7 @@
 Originally forked from [raudette/lockandkey](https://github.com/raudette/lockandkey) This project was created to solve a technoligical shortcoming in my current apartment. At least in my building the buzzer system is only designed to ring phones directly connected to a phonejack in the unit. This isn't ideal since I may not always be home when I want to let someone into my building.
 
 ## How does it work?
-A Raspberry Pi runs a nodejs application backed by a mongo databases for persistent data. The TFM-561U USB modem (56k dial up sounds anyone?) handles passing the call along to the Raspberry Pi so we can determine what we want to do with it. If a guest has the necessary login credentials they can visit my login portal. On successful authentication the user is redirected to a page which tells them they have **_xx_** number of minutes to buzz in before the system will lock them out again.
+A Raspberry Pi runs a nodejs application backed by a mongo databases for persistent data. The TFM-561U USB modem (56k dial up sounds anyone?) handles passing the call along to the Raspberry Pi so we can determine what we want to do with it. If a guest has the necessary login credentials they can visit my login portal. On successful authentication the user is redirected to a page which tells them they have **_xx_** number of minutes to buzz in before the system will lock them out again. The admin is also sent an email letting them know which user has just logged in.
 
 When the app notices a succesful login it handles a few things:
 1. Sets the usesrs `LOCK` flag to `False`
@@ -23,12 +23,18 @@ lockandkeyconfig.json contains a few options you can customize to your liking:
 * **adminport:** port used for the admin portal (should be restricted to private lan)
 * **unlocktimeout:** number of minutes to wait after a succesful login. During this window the system will pickup, dial 6, and hangup. 
 * **modem_id:** string used to identify the modem which should be used by the application 
+* **sendgridkey:** Send Grid API key used for sending emails on succesful logins
+* **emailto:** Address which emails will be sent to.
+* **emailfrom:** You can essentially put whatever you want here. I'm using no-reploy@mydomain.
 ```json
 {
   "port":3000,
   "adminport":3001,
   "unlocktimeout":15,
   "modem_id":"Conexant"
+  "sendgridkey": "<API_KEY>",
+  "emailto": "youremail@example.com",
+  "emailfrom": "no-reply@example.com"
 }
 ```
 
@@ -41,8 +47,6 @@ lockandkeyconfig.json contains a few options you can customize to your liking:
 
 ## TODO
 - [ ] Setup Lets Encrypt for SSL
-- [ ] Create admin portal for adding and deleting users
-- [ ] Setup email alerts when someone logins or dials my buzzer
 
 ## Credit
 Original codebase: [raudette/lockandkey](https://github.com/raudette/lockandkey)  
