@@ -1,22 +1,32 @@
-var express = require('express'),
-    http = require('http'),
-    path = require('path'),
-    mongoose = require('mongoose'),
-    hash = require('./pass').hash;
-var adminexpress = require('express')
-var validator = require('node-validator');
-var fs = require('fs');
+var express = require("express"),
+    http = require("http"),
+    path = require("path"),
+    mongoose = require("mongoose"),
+    hash = require("./pass").hash;
+var adminexpress = require("express")
+var validator = require("node-validator");
+var fs = require("fs");
 require( "console-stamp" )( console, { pattern : "dd/mm/yyyy HH:MM:ss.l" } );
-
 
 var app = express()
 var admin = adminexpress()
 
-/*
-Database and Models
-*/
+// Read in key:values from config file
+var data = fs.readFileSync("./lockandkeyconfig.json"),Config;
+try {
+  Config = JSON.parse(data);
+} catch (err) {
+  console.log("Error parsing config")
+  console.log(err);
+}
+
+// Setup sendgrid
+var sendgrid  = require("sendgrid")(Config.sendgridkey);
+
+// Database and Model
 mongoose.connect("mongodb://localhost/myapp");
 var UserSchema = new mongoose.Schema({
+    active: Boolean,
     username: String,
     password: String,
     salt: String,
@@ -26,20 +36,17 @@ var UserSchema = new mongoose.Schema({
     end_date: Date
 });
 
-var User = mongoose.model('users', UserSchema);
-/*
-Middlewares and configurations
-*/
+var User = mongoose.model("users", UserSchema);
 
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
+// Middlewares and configurations
+var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
+var session = require("express-session");
 app.use(bodyParser());
-app.use(cookieParser('Authentication Tutorial '));
-app.use(session({secret: '1234567890QWERTY'}));
-app.use('/', express.static(__dirname + '/public'));
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
+app.use(session({secret: "1234567890QWERTY"}));
+app.use("/", express.static(__dirname + "/public"));
+app.set("views", __dirname + "/views");
+app.set("view engine", "jade");
 
 app.get("/", function (req, res) {
   res.redirect("/login");
@@ -50,7 +57,7 @@ app.use(function (req, res, next) {
       msg = req.session.success;
   delete req.session.error;
   delete req.session.success;
-  res.locals.message = '';
+  res.locals.message = "";
   res.locals.session = req.session
   if (err) res.locals.message = err;
   if (msg) res.locals.message = msg;
@@ -59,35 +66,45 @@ app.use(function (req, res, next) {
 });
 
 
-/*
-Helper Functions
-*/
+// Helper Functions
 function authenticate(name, pass, fn) {
-  if (!module.parent) console.log('authenticating %s', name);
+  if (!module.parent) console.log("Attempting to authenticate %s", name);
 
   User.findOne({
-    username: name
+    username: name, active: true
   },
 
   function (err, user) {
     if (user) {
-      if (err) return fn(new Error('cannot find user'));
+      if (err) return fn(new Error("Cannot find user"));
 	hash(pass, user.salt, function (err, hash) {
 	  if (err) return fn(err);
 	  if (hash == user.hash) return fn(null, user);
-	    fn(new Error('invalid password'));
+	    fn(new Error("Invalid password"));
 	});
     } else {
-      return fn(new Error('cannot find user'));
+      return fn(new Error("Cannot find user"));
     }
   });
 }
 
+function sendMail(subject, body) {
+
+  sendgrid.send({
+    to:       Config.emailto,
+    from:     Config.emailfrom,
+    subject:  subject,
+    text:     body 
+  }, function(err, json) {
+    if (err) { return console.error(err); }
+    console.log(json);
+  });
+}
 function requiredAuthentication(req, res, next) {
   if (req.session.user) {
     next();
   } else {
-    req.session.error = 'Access denied!';
+    req.session.error = "Access denied!";
     res.redirect('/login');
   }
 }
@@ -99,30 +116,23 @@ function userExist(req, res, next) {
     if (count === 0) {
       next();
     } else {
-      req.session.error = "User Exist"
-      res.redirect("/signup");
+      req.session.error = "That username already exists."
+      res.redirect("/admin");
     }
   });
 }
 
-var bodyParser = require('body-parser')
+var bodyParser = require("body-parser")
 // app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({       extended: true}));  // to support URL-encoded bodies
-admin.use(bodyParser.urlencoded({       extended: true}));  // to support URL-encoded bodies
+app.use(bodyParser.urlencoded({extended: true}));  // to support URL-encoded bodies
+admin.use(session({secret: "1234567890QWERTY"}));
+admin.use(bodyParser.urlencoded({extended: true}));  // to support URL-encoded bodies
 
-
-// Config
-var data = fs.readFileSync('./lockandkeyconfig.json'),Config;
-try {
-  Config = JSON.parse(data);
-} catch (err) {
-  console.log('Error parsing config')
-  console.log(err);
-}
 
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
 var PickUpAndDialSix = false;
+
 // use this to store port of desired modem
 var modemport;
 var modem;
@@ -138,7 +148,7 @@ serialport.list(function (err, ports) {
   });
 
   if (modemport==undefined) {
-    console.log("No modem found.  Check that modem is connected and modem_id is set in lockandkeyconfig.json");
+    console.log("No modem found. Check that modem is connected and modem_id is set in lockandkeyconfig.json");
     process.exit(1);
   }
 
@@ -169,17 +179,17 @@ serialport.list(function (err, ports) {
     modem.write("ATS11=150\r", function(err, results) {
     });
 
-    modem.on('data', function(data) {
+    modem.on("data", function(data) {
       console.log(data);
 
-      if ((data.substring(0,4) == "RING")&&(PickUpAndDialSix == true)) {
+      if ((data.substring(0,4) == "RING") && (PickUpAndDialSix == true)) {
 	// Using delays worked better than reading an OK response from the modem and sending the next command. You may have to play with timeout values
 	setTimeout(modemPickup, 200);
 	setTimeout(modemDial6, 2000);
 	setTimeout(modemHangup, 4000);
       }
 
-      if ((data.substring(0,4) == "RING")&&(PickUpAndDialSix == false)) {
+      if ((data.substring(0,4) == "RING") && (PickUpAndDialSix == false)) {
 	console.log("Ring detected, but don't pick up");
       }
 
@@ -198,7 +208,7 @@ var server = app.listen(Config.port, function () {
   var host = server.address().address
   var port = server.address().port
 
-  console.log('Lock and Key - Public Interface Listening At http://%s:%s', host, port)
+  console.log("Lock and Key - Public Interface Listening At http://%s:%s", host, port)
 })
 
 var adminserver = admin.listen(Config.adminport, function () {
@@ -206,69 +216,28 @@ var adminserver = admin.listen(Config.adminport, function () {
   var host = adminserver.address().address
   var port = adminserver.address().port
   
-  console.log('Lock and Key - Admin Interface Listening At http://%s:%s', host, port)
+  console.log("Lock and Key - Admin Interface Listening At http://%s:%s", host, port)
 })
 
 
-//app.use('/', express.static(__dirname + '/public'));
-admin.use('/', express.static(__dirname + '/admin'));
-admin.get('/', function(req, res) {
-  res.sendFile('admin.html', { root: __dirname  + '/admin'}); 
+admin.use("/", express.static(__dirname + "/public"));
+admin.use(function (req, res, next) {
+  var err = req.session.error,
+      msg = req.session.success;
+  delete req.session.error;
+  delete req.session.success;
+  res.locals.message = "";
+  res.locals.session = req.session
+  if (err) res.locals.message = err;
+  if (msg) res.locals.message = msg;
+
+  next();
 });
-
-admin.get('/admin', function(req, res) {
-  res.sendFile('admin.html', { root: __dirname  + '/admin'}); 
+admin.set("views", __dirname + "/views");
+admin.set("view engine", "jade");
+admin.get("/", function(req, res) {
+  res.redirect("/admin");
 });
-
-
-admin.post('/addaccess', function (request, response) {
-
-  console.log(request.body);
-  //this is where we can do the post
-  errmsg = "";
-			
-  if (!validator.isIsoDate(request.body.startdate)) {errmsg=errmsg +"Bad start date. ";}
-  if (!validator.isIsoDate(request.body.stopdate)) {errmsg=errmsg +"Bad stop date. ";}
-  if (request.body.password.length<10) {errmsg=errmsg +"Password must be at least 10 characters. ";}
-  if (request.body.note.length<1) {errmsg=errmsg +"Please enter a note. ";}
-		
-  if (errmsg.length>0) {
-    response.redirect('/admin?error='+encodeURIComponent(errmsg));
-  }
-		
-  password = bcrypt.hashSync(request.body.password);
-  startdate = request.body.startdate;
-  stopdate = request.body.stopdate;
-  note = request.body.note;
-			
-  if (typeof request.body.admin !== 'undefined') { admin = 'TRUE'; } else { admin = 'FALSE';} 
-    try {
-      console.log(query);
-      response.redirect('/admin?success');
-    } catch (exception) {
-      response.redirect('/admin?error');
-    }
-});	
-
-
-admin.post('/delete', function (request, response){
-  // this is where we can do the post
-  errmsg = "";
-			
-  if (!validator.isInteger(request.body.id)) {errmsg=errmsg +"Invalid record ";}
-  if (errmsg.length>0) {
-    response.redirect('/admin?recordbad='+encodeURIComponent(errmsg));
-  }
-		
-  try {
-    query = "DELETE FROM access WHERE id="+request.body.id+";";
-    console.log(query);
-    db.run(query);
-    response.redirect('/admin?recordgood');
-  } catch (exception) {
-    response.redirect('/admin?recordbad');
-  }
-});	
 
 
 //Run this periodically to see if we should re-lock the door (ie: set a flag to not answer and dial nine)
@@ -303,14 +272,14 @@ app.get("/login", function (req, res, next) {
   }
 });
 
-app.get('/logout', function (req, res) {
+app.get("/logout", function (req, res) {
   req.session.destroy(function () {
-    res.redirect('/');
+    res.redirect("/");
   });
 });
 
 app.get("/success", requiredAuthentication, function (req, res) {
-  res.render('success', {
+  res.render("success", {
     username: req.session.user.username,
     endDate: req.session.enddate
   });
@@ -324,61 +293,65 @@ app.post("/login", function (req, res) {
         var endDate = new Date(startDate.getTime() + Config.unlocktimeout*60000);
         req.session.user = user;
         req.session.enddate = endDate
-        req.session.success = 'Authenticated as ' + user.username + ', you have until: ' + endDate + ' to buzz up.';
+        req.session.success = "Authenticated as " + user.username + ", you have until: " + endDate + " to buzz up.";
         var setUser = function(){
 	  User.update({username : user.username}, {$set:{start_date : startDate, end_date : new Date(endDate), lock : false}}, function(err, result){
 	    if ( err ) throw err;
-	    console.log("Updated: " + result);
+	    console.log("Updated: " + user.username);
 	  });
 	}
-        
+       
+        // Send an email
+        sendMail("Succesful Login", user.username + " has just logged in"); 
         // Turn On Auto Answer
         PickUpAndDialSix = true;
         setUser();
-        res.render('success', {
+        res.render("success", {
           username: req.session.user.username,
           endDate: req.session.enddate
         });
       });
     } else {
-      req.session.error = 'Authentication failed, please check your ' + ' username and password.';
-      res.redirect('/login')
+      req.session.error = "Authentication failed, please check your username and password.";
+      res.redirect("/login")
     }
   });
 });
 
-app.get("/signup", function (req, res) {
-  if (req.session.user) {
-    res.redirect("/");
-  } else {
-    res.render("signup");
-  }
+admin.get('/admin', function(req, res) {
+  User.find( {active: true}, function(err, userlist) {
+    if (err) return console.error(err);
+    res.render("admin", {
+      "userlist" : userlist
+    }); 
+  });
 });
 
-app.post("/signup", userExist, function (req, res) {
+admin.post("/disableuser", function (req, res) {
+  User.update({ username: req.body.username, active: true}, {$set:{active: false}}, function(err) {
+    if (err) throw err;
+    res.redirect("admin");
+  });
+});
+
+admin.post("/adduser", userExist, function (req, res) {
   var password = req.body.password;
   var username = req.body.username;
 
   hash(password, function (err, salt, hash) {
     if (err) throw err;
       var user = new User({
+        active: true,
         username: username,
         salt: salt,
         hash: hash,
         lock: false,
         start_date: new Date(),
-        end_date: new Date()
+        end_date: new Date().getTime() + Config.unlocktimeout*60000
       }).save(function (err, newUser) {
         if (err) throw err;
-          authenticate(newUser.username, password, function(err, user){
-            if (user){
-              req.session.regenerate(function(){
-                req.session.user = user;
-                req.session.success = 'Authenticated as ' + user.username + ' click to <a href="/logout">logout</a>. ' + ' You may now access <a href="/restricted">/restricted</a>.';
-                res.redirect('/');
-              });
-            }
-          });
+        req.session.succcess = "User added";
+        res.redirect('admin');
       });
   });
 });
