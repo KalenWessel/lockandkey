@@ -48,7 +48,6 @@ lockandkeyconfig.json contains a few options you can customize to your liking:
 ## Installaition
 ```
 sudo apt-get update
-sudo apt-get install mongodb
 sudo apt-get install git npm nodejs mongodb
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 
