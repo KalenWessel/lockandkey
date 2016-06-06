@@ -1,0 +1,29 @@
+{
+  "name": "lockandkey",
+  "version": "0.0.1",
+  "description": "A web concierge for your apartments main entrance",
+  "main": "lockandkey.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KalenWessel/lockandkey.git"
+  },
+  "author": "Kalen Wessel",
+  "license": "Apache",
+  "bugs": {
+    "url": "https://github.com/KalenWessel/lockandkey/issues"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "console-stamp": "^0.2.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "jade": "^1.11.0",
+    "mongoose": "^4.4.20",
+    "sendgrid": "^2.0.0",
+    "serialport": "^3.1.2"
+  }
+}
