@@ -3,4 +3,7 @@
   "adminport":3001,
   "unlocktimeout":1,
   "modem_id":"Conexant"
+  "sendgridkey": "<API_KEY>",
+  "emailto": "youremail@example.com",
+  "emailfrom": "no-reply@example.com"
 }
