@@ -4,7 +4,6 @@ var express = require("express"),
     mongoose = require("mongoose"),
     hash = require("./pass").hash;
 var adminexpress = require("express")
-var validator = require("node-validator");
 var fs = require("fs");
 require( "console-stamp" )( console, { pattern : "dd/mm/yyyy HH:MM:ss.l" } );
 
@@ -24,7 +23,7 @@ try {
 var sendgrid  = require("sendgrid")(Config.sendgridkey);
 
 // Database and Model
-mongoose.connect("mongodb://localhost/myapp");
+mongoose.connect("mongodb://localhost/lockandkey");
 var UserSchema = new mongoose.Schema({
     active: Boolean,
     username: String,
