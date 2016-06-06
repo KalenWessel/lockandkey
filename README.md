@@ -1,8 +1,8 @@
-# Lock And Key - automated doorman 
+# Lock And Key - a web concierge for your apartments main entrance
 ![Alt text](http://i.imgur.com/cjBl3mX.jpg "") ![Alt text](http://i.imgur.com/BqK13Bo.jpg "")
 
 ## About
-Originally forked from [raudette/lockandkey](https://github.com/raudette/lockandkey) This project was created to solve a technoligical shortcoming in my current apartment. At least in my building the buzzer system is only designed to ring phones directly connected to a phonejack in the unit. This isn't ideal since I may not always be home when I want to let someone into my building.
+Originally forked from [raudette/lockandkey](https://github.com/raudette/lockandkey) but heavily modified. This project was created to solve a technoligical shortcoming in my current apartment. At least in my building the buzzer system is only designed to ring phones directly connected to a phonejack in the unit. This isn't ideal since I may not always be home when I want to let someone into my building.
 
 ## How does it work?
 A Raspberry Pi runs a nodejs application backed by a mongo databases for persistent data. The TFM-561U USB modem (56k dial up sounds anyone?) handles passing the call along to the Raspberry Pi so we can determine what we want to do with it. If a guest has the necessary login credentials they can visit my login portal. On successful authentication the user is redirected to a page which tells them they have **_xx_** number of minutes to buzz in before the system will lock them out again. The admin is also sent an email letting them know which user has just logged in.
@@ -32,7 +32,7 @@ lockandkeyconfig.json contains a few options you can customize to your liking:
 * **modem_id:** string used to identify the modem which should be used by the application 
 * **sendgridkey:** Send Grid API key used for sending emails on succesful logins
 * **emailto:** Address which emails will be sent to.
-* **emailfrom:** You can essentially put whatever you want here. I'm using no-reploy@mydomain.
+* **emailfrom:** You can essentially put whatever you want here. I'm using no-reply@example.com
 ```json
 {
   "port":3000,
@@ -45,12 +45,28 @@ lockandkeyconfig.json contains a few options you can customize to your liking:
 }
 ```
 
-## Setup
-1. Update OS 
-2. Install mongo db
-3. Clone git repo
-4. npm install
+## Installaition
+```
+sudo apt-get update
+sudo apt-get install mongodb
+sudo apt-get install git npm nodejs mongodb
+sudo ln -s /usr/bin/nodejs /usr/bin/node
 
+git clone https://github.com/raudette/lockandkey.git
+cd lockandkey/
+
+npm install
+```
+
+### Running as a service
+```
+sudo npm install -g forever
+sudo npm install -g forever-service
+sudo forever-service install lockandkey --script lockandkey.js
+sudo service lockandkey start
+```
+
+Logs will write to `/var/log/lockandkey.log`
 
 ## TODO
 - [ ] Setup Lets Encrypt for SSL
