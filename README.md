@@ -12,7 +12,7 @@ When the app notices a succesful login it handles a few things:
 2. Updates the users last successful login `timestamp`
 3. Sets the `auto-answer` flag to `True`
 
-Now when the guest dials my unit number the application will answer the call, dial 6, and hang up the call. The main entrance door will be unlocked and my guest can enter the building. A check runs every 10 seconds looking for users who have their `LOCK` flag set to `False` and `current time` is not greater than the `login time + unlocktimeout`. 
+Now when the guest dials my unit number the application will answer the call, dial 6, and hang up the call. The main entrance door will be unlocked and my guest can enter the building. A check runs every 10 seconds looking for users who have their `LOCK` flag set to `False` and `current time` is not greater than the `login time + unlocktimeout`. When it finds a user that matches that criteria it sets the `LOCK` flag back to `True` and disables the auto-answer.
 
 ## Admin Portal
 ![Alt text](http://i.imgur.com/x8gUg9T.jpg "") 
@@ -69,6 +69,7 @@ Logs will write to `/var/log/lockandkey.log`
 
 ## TODO
 - [ ] Setup Lets Encrypt for SSL
+- [ ] Text-To-Speach greeting
 
 ## Credit
 Original codebase: [raudette/lockandkey](https://github.com/raudette/lockandkey)  
