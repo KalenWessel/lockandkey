@@ -24,7 +24,7 @@ try {
 var sendgrid  = require("sendgrid")(Config.sendgridkey);
 
 // Database and Model
-mongoose.connect("mongodb://localhost/myapp");
+mongoose.connect("mongodb://localhost/lockandkey");
 var UserSchema = new mongoose.Schema({
     active: Boolean,
     username: String,
@@ -316,6 +316,10 @@ app.post("/login", function (req, res) {
       res.redirect("/login")
     }
   });
+});
+
+app.get("/ping", function(req, res) {
+  res.render("ping");
 });
 
 admin.get('/admin', function(req, res) {
