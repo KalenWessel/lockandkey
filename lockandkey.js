@@ -4,7 +4,6 @@ var express = require("express"),
     mongoose = require("mongoose"),
     hash = require("./pass").hash;
 var adminexpress = require("express")
-var validator = require("node-validator");
 var fs = require("fs");
 require( "console-stamp" )( console, { pattern : "dd/mm/yyyy HH:MM:ss.l" } );
 
