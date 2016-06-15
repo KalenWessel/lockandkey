@@ -4,6 +4,8 @@
 ## About
 Originally forked from [raudette/lockandkey](https://github.com/raudette/lockandkey) This project was created to solve a technoligical shortcoming in my current apartment. At least in my building the buzzer system is only designed to ring phones directly connected to a phonejack in the unit. This isn't ideal since I may not always be home when I want to let someone into my building.
 
+![Alt text](http://i.imgur.com/eVtwtzu.jpg "")
+
 ## How does it work?
 A Raspberry Pi runs a nodejs application backed by a mongo databases for persistent data. The TFM-561U USB modem (56k dial up sounds anyone?) handles passing the call along to the Raspberry Pi so we can determine what we want to do with it. If a guest has the necessary login credentials they can visit my login portal. On successful authentication the user is redirected to a page which tells them they have **_xx_** number of minutes to buzz in before the system will lock them out again. The admin is also sent an email letting them know which user has just logged in.
 
