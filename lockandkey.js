@@ -15,16 +15,6 @@ try {
   console.log(err);
 }
 
-// Middlewares and configurations
-var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
-var session = require("express-session");
-app.use(bodyParser());
-app.use(session({secret: "1234567890QWERTY"}));
-app.use("/", express.static(__dirname + "/public"));
-app.set("views", __dirname + "/views");
-app.set("view engine", "jade");
-
 app.get("/login", function (req, res) {
   if (req.query.token == Config.secret_token) {
     PickUpAndDialSix = true;
@@ -36,11 +26,6 @@ app.get("/login", function (req, res) {
     res.send('Denied');
   }
 });
-
-var bodyParser = require("body-parser")
-// app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({extended: true}));  // to support URL-encoded bodies
-
 
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;

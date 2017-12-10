@@ -20,10 +20,6 @@
     "console-stamp": "^0.2.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.13.4",
-    "express-session": "^1.13.0",
-    "jade": "^1.11.0",
-    "mongoose": "^4.4.20",
-    "sendgrid": "^2.0.0",
     "serialport": "^3.1.2"
   }
 }
