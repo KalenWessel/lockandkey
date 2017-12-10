@@ -1,6 +1,4 @@
 # Lock And Key - a web concierge for your apartments main entrance
-![Alt text](http://i.imgur.com/cjBl3mX.jpg "") ![Alt text](http://i.imgur.com/BqK13Bo.jpg "")
-
 ## About
 A simplified approach from the originial Lock And Key. This branch has a single endpoint which answers the phone when the correct token is provided.
 
