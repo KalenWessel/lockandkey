@@ -34,6 +34,7 @@ sudo apt-get install git npm nodejs mongodb
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 git clone https://github.com/KalenWessel/lockandkey.git
+git checkout google-home
 cd lockandkey/
 
 npm install
