@@ -33,7 +33,7 @@ sudo apt-get update
 sudo apt-get install git npm nodejs mongodb
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 
-git clone https://github.com/raudette/lockandkey.git
+git clone https://github.com/KalenWessel/lockandkey.git
 cd lockandkey/
 
 npm install
